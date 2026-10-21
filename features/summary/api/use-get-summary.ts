@@ -1,17 +1,17 @@
-import { useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "next/navigation";
+import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'next/navigation';
 
-import { client } from "@/lib/hono";
-import { convertAmountFromMiliunits } from "@/lib/utils";
+import { client } from '@/lib/hono';
+import { convertAmountFromMiliunits } from '@/lib/utils';
 
 export const useGetSummary = () => {
   const params = useSearchParams();
-  const from = params.get("from") || "";
-  const to = params.get("to") || "";
-  const accountId = params.get("accountId") || "";
+  const from = params.get('from') || '';
+  const to = params.get('to') || '';
+  const accountId = params.get('accountId') || '';
 
   const query = useQuery({
-    queryKey: ["summary", { from, to, accountId }],
+    queryKey: ['summary', { from, to, accountId }],
     queryFn: async () => {
       const response = await client.api.summary.$get({
         query: {
@@ -22,7 +22,7 @@ export const useGetSummary = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch summary");
+        throw new Error('Failed to fetch summary');
       }
 
       const { data } = await response.json();
@@ -39,8 +39,8 @@ export const useGetSummary = () => {
           ...day,
           income: convertAmountFromMiliunits(day.income),
           expenses: convertAmountFromMiliunits(day.expenses),
-        }))
-      }
+        })),
+      };
     },
   });
 

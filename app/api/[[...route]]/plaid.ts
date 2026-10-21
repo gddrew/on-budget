@@ -1,32 +1,32 @@
-import { z } from "zod";
-import { Hono } from "hono";
-import { and, eq, isNotNull } from "drizzle-orm";
-import { createId } from "@paralleldrive/cuid2";
-import { zValidator } from "@hono/zod-validator";
-import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
-import { 
-  Configuration, 
-  CountryCode, 
-  PlaidApi, 
-  PlaidEnvironments, 
-  Products
-} from "plaid";
+import { z } from 'zod';
+import { Hono } from 'hono';
+import { and, eq, isNotNull } from 'drizzle-orm';
+import { createId } from '@paralleldrive/cuid2';
+import { zValidator } from '@hono/zod-validator';
+import { clerkMiddleware, getAuth } from '@hono/clerk-auth';
+import {
+  Configuration,
+  CountryCode,
+  PlaidApi,
+  PlaidEnvironments,
+  Products,
+} from 'plaid';
 
-import { db } from "@/db/drizzle";
-import { 
-  accounts, 
-  categories, 
-  connectedBanks, 
-  transactions
-} from "@/db/schema";
-import { convertAmountToMiliunits } from "@/lib/utils";
+import { db } from '@/db/drizzle';
+import {
+  accounts,
+  categories,
+  connectedBanks,
+  transactions,
+} from '@/db/schema';
+import { convertAmountToMiliunits } from '@/lib/utils';
 
 const configuration = new Configuration({
   basePath: PlaidEnvironments.sandbox,
   baseOptions: {
     headers: {
-      "PLAID-CLIENT-ID": process.env.PLAID_CLIENT_TOKEN,
-      "PLAID-SECRET": process.env.PLAID_SECRET_TOKEN,
+      'PLAID-CLIENT-ID': process.env.PLAID_CLIENT_TOKEN,
+      'PLAID-SECRET': process.env.PLAID_SECRET_TOKEN,
     },
   },
 });
@@ -34,128 +34,100 @@ const configuration = new Configuration({
 const client = new PlaidApi(configuration);
 
 const app = new Hono()
-  .get(
-    "/connected-bank",
-    clerkMiddleware(),
-    async (c) => {
-      const auth = getAuth(c);
+  .get('/connected-bank', clerkMiddleware(), async (c) => {
+    const auth = getAuth(c);
 
-      if (!auth?.userId) {
-        return c.json({ error: "Unauthorized" }, 401);
-      }
+    if (!auth?.userId) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
 
-      const [connectedBank] = await db
-        .select()
-        .from(connectedBanks)
-        .where(
-          eq(
-            connectedBanks.userId,
-            auth.userId,
-          ),
-        );
+    const [connectedBank] = await db
+      .select()
+      .from(connectedBanks)
+      .where(eq(connectedBanks.userId, auth.userId));
 
-      return c.json({ data: connectedBank || null });
-    },
-  )
-  .delete(
-    "/connected-bank",
-    clerkMiddleware(),
-    async (c) => {
-      const auth = getAuth(c);
+    return c.json({ data: connectedBank || null });
+  })
+  .delete('/connected-bank', clerkMiddleware(), async (c) => {
+    const auth = getAuth(c);
 
-      if (!auth?.userId) {
-        return c.json({ error: "Unauthorized" }, 401);
-      }
+    if (!auth?.userId) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
 
-      const [connectedBank] = await db
-        .delete(connectedBanks)
-        .where(
-          eq(
-            connectedBanks.userId,
-            auth.userId,
-          ),
-        )
-        .returning({
-          id: connectedBanks.id,
-        });
-
-      if (!connectedBank) {
-        return c.json({ error: "Not found" }, 404);
-      }
-
-      await db
-        .delete(accounts)
-        .where(
-          and(
-            eq(accounts.userId, auth.userId),
-            isNotNull(accounts.plaidId),
-          ),
-        );
-
-      await db
-        .delete(categories)
-        .where(
-          and(
-            eq(categories.userId, auth.userId),
-            isNotNull(categories.plaidId),
-          ),
-        );
-
-      return c.json({ data: connectedBank });
-    },
-  )
-  .post(
-    "/create-link-token",
-    clerkMiddleware(),
-    async (c) => {
-      const auth = getAuth(c);
-
-      if (!auth?.userId) {
-        return c.json({ error: "Unauthorized" }, 401);
-      }
-
-      const token = await client.linkTokenCreate({
-        user: {
-          client_user_id: auth.userId,
-        },
-        client_name: "Finance Tutorial",
-        products: [Products.Transactions],
-        country_codes: [CountryCode.Us],
-        language: "en",
+    const [connectedBank] = await db
+      .delete(connectedBanks)
+      .where(eq(connectedBanks.userId, auth.userId))
+      .returning({
+        id: connectedBanks.id,
       });
 
-      return c.json({ data: token.data.link_token }, 200);
-    },
-  )
+    if (!connectedBank) {
+      return c.json({ error: 'Not found' }, 404);
+    }
+
+    await db
+      .delete(accounts)
+      .where(
+        and(eq(accounts.userId, auth.userId), isNotNull(accounts.plaidId)),
+      );
+
+    await db
+      .delete(categories)
+      .where(
+        and(eq(categories.userId, auth.userId), isNotNull(categories.plaidId)),
+      );
+
+    return c.json({ data: connectedBank });
+  })
+  .post('/create-link-token', clerkMiddleware(), async (c) => {
+    const auth = getAuth(c);
+
+    if (!auth?.userId) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    const token = await client.linkTokenCreate({
+      user: {
+        client_user_id: auth.userId,
+      },
+      client_name: 'Finance Tutorial',
+      products: [Products.Transactions],
+      country_codes: [CountryCode.Us],
+      language: 'en',
+    });
+
+    return c.json({ data: token.data.link_token }, 200);
+  })
   .post(
-    "/exchange-public-token",
+    '/exchange-public-token',
     clerkMiddleware(),
     zValidator(
-      "json",
+      'json',
       z.object({
         publicToken: z.string(),
       }),
     ),
     async (c) => {
       const auth = getAuth(c);
-      const { publicToken } = c.req.valid("json");
+      const { publicToken } = c.req.valid('json');
 
       if (!auth?.userId) {
-        return c.json({ error: "Unauthorized" }, 401);
+        return c.json({ error: 'Unauthorized' }, 401);
       }
 
-     const exchange = await client.itemPublicTokenExchange({
-      public_token: publicToken,
-     });
+      const exchange = await client.itemPublicTokenExchange({
+        public_token: publicToken,
+      });
 
-     const [connectedBank] = await db
-      .insert(connectedBanks)
-      .values({
-        id: createId(),
-        userId: auth.userId,
-        accessToken: exchange.data.access_token,
-      })
-      .returning();
+      const [connectedBank] = await db
+        .insert(connectedBanks)
+        .values({
+          id: createId(),
+          userId: auth.userId,
+          accessToken: exchange.data.access_token,
+        })
+        .returning();
 
       const plaidTransactions = await client.transactionsSync({
         access_token: connectedBank.accessToken,
@@ -184,19 +156,21 @@ const app = new Hono()
         .values(
           plaidCategories.data.categories.map((category) => ({
             id: createId(),
-            name: category.hierarchy.join(", "),
+            name: category.hierarchy.join(', '),
             plaidId: category.category_id,
             userId: auth.userId,
           })),
         )
         .returning();
 
-      const newTransactionsValues = plaidTransactions.data.added
-        .reduce((acc, transaction) => {
-          const account = newAccounts
-            .find((account) => account.plaidId === transaction.account_id);
-          const category = newCategories
-            .find((category) => category.plaidId === transaction.category_id);
+      const newTransactionsValues = plaidTransactions.data.added.reduce(
+        (acc, transaction) => {
+          const account = newAccounts.find(
+            (account) => account.plaidId === transaction.account_id,
+          );
+          const category = newCategories.find(
+            (category) => category.plaidId === transaction.category_id,
+          );
           const amountInMiliunits = convertAmountToMiliunits(
             transaction.amount,
           );
@@ -212,14 +186,14 @@ const app = new Hono()
               categoryId: category?.id,
             });
           }
-          
+
           return acc;
-        }, [] as typeof transactions.$inferInsert[]);
+        },
+        [] as (typeof transactions.$inferInsert)[],
+      );
 
       if (newTransactionsValues.length > 0) {
-        await db
-          .insert(transactions)
-          .values(newTransactionsValues);
+        await db.insert(transactions).values(newTransactionsValues);
       }
 
       return c.json({ ok: true }, 200);

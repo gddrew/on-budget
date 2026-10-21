@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { Edit, MoreHorizontal, Trash } from "lucide-react";
+import { Edit, MoreHorizontal, Trash } from 'lucide-react';
 
-import { useOpenCategory } from "@/features/categories/hooks/use-open-category";
-import { useDeleteCategory } from "@/features/categories/api/use-delete-category";
+import { useOpenCategory } from '@/features/categories/hooks/use-open-category';
+import { useDeleteCategory } from '@/features/categories/api/use-delete-category';
 
-import { useConfirm } from "@/hooks/use-confirm";
-import { Button } from "@/components/ui/button";
+import { useConfirm } from '@/hooks/use-confirm';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 type Props = {
   id: string;
@@ -20,8 +20,8 @@ type Props = {
 
 export const Actions = ({ id }: Props) => {
   const [ConfirmDialog, confirm] = useConfirm(
-    "Are you sure?",
-    "You are about to delete this category."
+    'Are you sure?',
+    'You are about to delete this category.',
   );
 
   const deleteMutation = useDeleteCategory(id);
@@ -40,23 +40,23 @@ export const Actions = ({ id }: Props) => {
       <ConfirmDialog />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="size-8 p-0">
-            <MoreHorizontal className="size-4" />
+          <Button variant='ghost' className='size-8 p-0'>
+            <MoreHorizontal className='size-4' />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align='end'>
           <DropdownMenuItem
             disabled={deleteMutation.isPending}
             onClick={() => onOpen(id)}
           >
-            <Edit className="size-4 mr-2" />
+            <Edit className='size-4 mr-2' />
             Edit
           </DropdownMenuItem>
           <DropdownMenuItem
             disabled={deleteMutation.isPending}
             onClick={handleDelete}
           >
-            <Trash className="size-4 mr-2" />
+            <Trash className='size-4 mr-2' />
             Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
