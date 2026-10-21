@@ -92,6 +92,8 @@ const main = async () => {
     await db.insert(accounts).values(SEED_ACCOUNTS).execute();
     // Seed transactions
     await db.insert(transactions).values(SEED_TRANSACTIONS).execute();
+    // Close the pool
+    await pool.end();
   } catch (error) {
     console.error('Error during seed:', error);
     process.exit(1);
