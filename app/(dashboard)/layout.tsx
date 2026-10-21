@@ -1,5 +1,7 @@
 import { Header } from '@/components/header';
 
+export const dynamic = 'force-dynamic';
+
 type Props = {
   children: React.ReactNode;
 };
