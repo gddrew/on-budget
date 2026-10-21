@@ -7,9 +7,12 @@ import accounts from './accounts';
 import categories from './categories';
 import transactions from './transactions';
 
+import { auth } from '@/lib/auth';
+
 export const runtime = 'nodejs';
 
 const app = new Hono().basePath('/api');
+app.on(['GET', 'POST'], '/auth/*', (c) => auth.handler(c.req.raw));
 
 const routes = app
   .route('/plaid', plaid)
