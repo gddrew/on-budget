@@ -3,13 +3,13 @@ import { Hono } from 'hono';
 import { and, eq, inArray } from 'drizzle-orm';
 import { createId } from '@paralleldrive/cuid2';
 import { zValidator } from '@hono/zod-validator';
-import { clerkMiddleware, getAuth } from '@hono/clerk-auth';
+import { authMiddleware, getAuth } from '@/lib/hono-auth';
 
 import { db } from '@/db/drizzle';
 import { categories, insertCategorySchema } from '@/db/schema';
 
 const app = new Hono()
-  .get('/', clerkMiddleware(), async (c) => {
+  .get('/', authMiddleware(), async (c) => {
     const auth = getAuth(c);
 
     if (!auth?.userId) {
@@ -34,7 +34,7 @@ const app = new Hono()
         id: z.string().optional(),
       }),
     ),
-    clerkMiddleware(),
+    authMiddleware(),
     async (c) => {
       const auth = getAuth(c);
       const { id } = c.req.valid('param');
@@ -64,7 +64,7 @@ const app = new Hono()
   )
   .post(
     '/',
-    clerkMiddleware(),
+    authMiddleware(),
     zValidator(
       'json',
       insertCategorySchema.pick({
@@ -93,7 +93,7 @@ const app = new Hono()
   )
   .post(
     '/bulk-delete',
-    clerkMiddleware(),
+    authMiddleware(),
     zValidator(
       'json',
       z.object({
@@ -125,7 +125,7 @@ const app = new Hono()
   )
   .patch(
     '/:id',
-    clerkMiddleware(),
+    authMiddleware(),
     zValidator(
       'param',
       z.object({
@@ -166,7 +166,7 @@ const app = new Hono()
   )
   .delete(
     '/:id',
-    clerkMiddleware(),
+    authMiddleware(),
     zValidator(
       'param',
       z.object({
