@@ -3,7 +3,7 @@ import { Hono } from 'hono';
 import { parse, subDays } from 'date-fns';
 import { createId } from '@paralleldrive/cuid2';
 import { zValidator } from '@hono/zod-validator';
-import { clerkMiddleware, getAuth } from '@hono/clerk-auth';
+import { authMiddleware, getAuth } from '@/lib/hono-auth';
 import { and, desc, eq, gte, inArray, lte, sql } from 'drizzle-orm';
 
 import { db } from '@/db/drizzle';
@@ -25,7 +25,7 @@ const app = new Hono()
         accountId: z.string().optional(),
       }),
     ),
-    clerkMiddleware(),
+    authMiddleware(),
     async (c) => {
       const auth = getAuth(c);
       const { from, to, accountId } = c.req.valid('query');
@@ -78,7 +78,7 @@ const app = new Hono()
         id: z.string().optional(),
       }),
     ),
-    clerkMiddleware(),
+    authMiddleware(),
     async (c) => {
       const auth = getAuth(c);
       const { id } = c.req.valid('param');
@@ -114,7 +114,7 @@ const app = new Hono()
   )
   .post(
     '/',
-    clerkMiddleware(),
+    authMiddleware(),
     zValidator(
       'json',
       insertTransactionSchema.omit({
@@ -142,7 +142,7 @@ const app = new Hono()
   )
   .post(
     '/bulk-create',
-    clerkMiddleware(),
+    authMiddleware(),
     zValidator(
       'json',
       z.array(
@@ -174,7 +174,7 @@ const app = new Hono()
   )
   .post(
     '/bulk-delete',
-    clerkMiddleware(),
+    authMiddleware(),
     zValidator(
       'json',
       z.object({
@@ -220,7 +220,7 @@ const app = new Hono()
   )
   .patch(
     '/:id',
-    clerkMiddleware(),
+    authMiddleware(),
     zValidator(
       'param',
       z.object({
@@ -277,7 +277,7 @@ const app = new Hono()
   )
   .delete(
     '/:id',
-    clerkMiddleware(),
+    authMiddleware(),
     zValidator(
       'param',
       z.object({

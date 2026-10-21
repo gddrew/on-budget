@@ -3,7 +3,7 @@ import { Hono } from 'hono';
 import { and, eq, isNotNull } from 'drizzle-orm';
 import { createId } from '@paralleldrive/cuid2';
 import { zValidator } from '@hono/zod-validator';
-import { clerkMiddleware, getAuth } from '@hono/clerk-auth';
+import { authMiddleware, getAuth } from '@/lib/hono-auth';
 import {
   Configuration,
   CountryCode,
@@ -34,7 +34,7 @@ const configuration = new Configuration({
 const client = new PlaidApi(configuration);
 
 const app = new Hono()
-  .get('/connected-bank', clerkMiddleware(), async (c) => {
+  .get('/connected-bank', authMiddleware(), async (c) => {
     const auth = getAuth(c);
 
     if (!auth?.userId) {
@@ -48,7 +48,7 @@ const app = new Hono()
 
     return c.json({ data: connectedBank || null });
   })
-  .delete('/connected-bank', clerkMiddleware(), async (c) => {
+  .delete('/connected-bank', authMiddleware(), async (c) => {
     const auth = getAuth(c);
 
     if (!auth?.userId) {
@@ -80,7 +80,7 @@ const app = new Hono()
 
     return c.json({ data: connectedBank });
   })
-  .post('/create-link-token', clerkMiddleware(), async (c) => {
+  .post('/create-link-token', authMiddleware(), async (c) => {
     const auth = getAuth(c);
 
     if (!auth?.userId) {
@@ -101,7 +101,7 @@ const app = new Hono()
   })
   .post(
     '/exchange-public-token',
-    clerkMiddleware(),
+    authMiddleware(),
     zValidator(
       'json',
       z.object({
@@ -116,6 +116,8 @@ const app = new Hono()
         return c.json({ error: 'Unauthorized' }, 401);
       }
 
+      const userId = auth.userId;
+
       const exchange = await client.itemPublicTokenExchange({
         public_token: publicToken,
       });
@@ -124,7 +126,7 @@ const app = new Hono()
         .insert(connectedBanks)
         .values({
           id: createId(),
-          userId: auth.userId,
+          userId: userId,
           accessToken: exchange.data.access_token,
         })
         .returning();
@@ -146,7 +148,7 @@ const app = new Hono()
             id: createId(),
             name: account.name,
             plaidId: account.account_id,
-            userId: auth.userId,
+            userId,
           })),
         )
         .returning();
@@ -158,7 +160,7 @@ const app = new Hono()
             id: createId(),
             name: category.hierarchy.join(', '),
             plaidId: category.category_id,
-            userId: auth.userId,
+            userId,
           })),
         )
         .returning();

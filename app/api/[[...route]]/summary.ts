@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
-import { clerkMiddleware, getAuth } from '@hono/clerk-auth';
+import { authMiddleware, getAuth } from '@/lib/hono-auth';
 import { subDays, parse, differenceInDays } from 'date-fns';
 import { and, desc, eq, gte, lt, lte, sql, sum } from 'drizzle-orm';
 
@@ -11,7 +11,7 @@ import { calculatePercentageChange, fillMissingDays } from '@/lib/utils';
 
 const app = new Hono().get(
   '/',
-  clerkMiddleware(),
+  authMiddleware(),
   zValidator(
     'query',
     z.object({
