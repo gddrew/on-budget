@@ -1,11 +1,13 @@
+// Always import packages at the top of the file
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { ClerkProvider } from '@clerk/nextjs';
 
+// Aliased imports should come after package imports
 import { Toaster } from '@/components/ui/sonner';
 import { QueryProvider } from '@/providers/query-provider';
 import { SheetProvider } from '@/providers/sheet-provider';
 
+// Last come relative imports
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -21,16 +23,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang='en'>
-        <body className={inter.className}>
-          <QueryProvider>
-            <SheetProvider />
-            <Toaster />
-            {children}
-          </QueryProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang='en'>
+      <body className={inter.className}>
+        <QueryProvider>
+          <SheetProvider />
+          <Toaster />
+          {children}
+        </QueryProvider>
+      </body>
+    </html>
   );
 }
