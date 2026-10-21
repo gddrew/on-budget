@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useDeleteConnectedBank } from "@/features/plaid/api/use-delete-connected-bank";
+import { useDeleteConnectedBank } from '@/features/plaid/api/use-delete-connected-bank';
 
-import { useConfirm } from "@/hooks/use-confirm";
-import { Button } from "@/components/ui/button";
+import { useConfirm } from '@/hooks/use-confirm';
+import { Button } from '@/components/ui/button';
 
 export const PlaidDisconnect = () => {
   const [Dialog, confirm] = useConfirm(
-    "Are you sure?",
-    "This will disconnect your bank account, and remove all associated data."
+    'Are you sure?',
+    'This will disconnect your bank account, and remove all associated data.',
   );
   const deleteConnectedBank = useDeleteConnectedBank();
 
@@ -26,8 +26,8 @@ export const PlaidDisconnect = () => {
       <Button
         onClick={onClick}
         disabled={deleteConnectedBank.isPending}
-        size="sm"
-        variant="ghost"
+        size='sm'
+        variant='ghost'
       >
         Disconnect
       </Button>

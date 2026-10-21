@@ -1,17 +1,17 @@
-import { z } from "zod";
+import { z } from 'zod';
 
-import { CategoryForm } from "@/features/categories/components/category-form";
-import { useNewCategory } from "@/features/categories/hooks/use-new-category";
-import { useCreateCategory } from "@/features/categories/api/use-create-category";
+import { CategoryForm } from '@/features/categories/components/category-form';
+import { useNewCategory } from '@/features/categories/hooks/use-new-category';
+import { useCreateCategory } from '@/features/categories/api/use-create-category';
 
-import { insertCategorySchema } from "@/db/schema";
+import { insertCategorySchema } from '@/db/schema';
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
+} from '@/components/ui/sheet';
 
 const formSchema = insertCategorySchema.pick({
   name: true,
@@ -34,20 +34,18 @@ export const NewCategorySheet = () => {
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="space-y-4">
+      <SheetContent className='space-y-4'>
         <SheetHeader>
-          <SheetTitle>
-            New Category
-          </SheetTitle>
+          <SheetTitle>New Category</SheetTitle>
           <SheetDescription>
             Create a new category to organize your transactions.
           </SheetDescription>
         </SheetHeader>
-        <CategoryForm 
-          onSubmit={onSubmit} 
+        <CategoryForm
+          onSubmit={onSubmit}
           disabled={mutation.isPending}
           defaultValues={{
-            name: "",
+            name: '',
           }}
         />
       </SheetContent>

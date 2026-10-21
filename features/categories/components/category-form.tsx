@@ -1,11 +1,11 @@
-import { z } from "zod";
-import { Trash } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from 'zod';
+import { Trash } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { insertCategorySchema } from "@/db/schema";
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { insertCategorySchema } from '@/db/schema';
 import {
   Form,
   FormControl,
@@ -13,7 +13,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from '@/components/ui/form';
 
 const formSchema = insertCategorySchema.pick({
   name: true,
@@ -48,47 +48,45 @@ export const CategoryForm = ({
   const handleDelete = () => {
     onDelete?.();
   };
-  
+
   return (
     <Form {...form}>
-      <form 
-        onSubmit={form.handleSubmit(handleSubmit)} 
-        className="space-y-4 pt-4"
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className='space-y-4 pt-4'
       >
         <FormField
-          name="name"
+          name='name'
           control={form.control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>
-                Name
-              </FormLabel>
+              <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input
                   disabled={disabled}
-                  placeholder="e.g. Food, Travel, etc."
+                  placeholder='e.g. Food, Travel, etc.'
                   {...field}
                 />
               </FormControl>
             </FormItem>
           )}
         />
-        <Button className="w-full" disabled={disabled}>
-          {id ? "Save changes" : "Create category"}
+        <Button className='w-full' disabled={disabled}>
+          {id ? 'Save changes' : 'Create category'}
         </Button>
         {!!id && (
           <Button
-            type="button"
+            type='button'
             disabled={disabled}
             onClick={handleDelete}
-            className="w-full"
-            variant="outline"
+            className='w-full'
+            variant='outline'
           >
-            <Trash className="size-4 mr-2" />
+            <Trash className='size-4 mr-2' />
             Delete category
           </Button>
         )}
       </form>
     </Form>
-  )
+  );
 };

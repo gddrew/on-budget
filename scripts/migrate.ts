@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 import { Pool } from 'pg';
-import { drizzle } from 'drizzle-orm/neon-http';
-import { migrate } from 'drizzle-orm/neon-http/migrator';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
 
 config({ path: '.env.local' });
 

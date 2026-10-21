@@ -1,41 +1,38 @@
-import { twMerge } from "tailwind-merge";
-import { type ClassValue, clsx } from "clsx";
-import { eachDayOfInterval, format, isSameDay, subDays } from "date-fns";
+import { twMerge } from 'tailwind-merge';
+import { type ClassValue, clsx } from 'clsx';
+import { eachDayOfInterval, format, isSameDay, subDays } from 'date-fns';
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-};
+  return twMerge(clsx(inputs));
+}
 
 export function convertAmountFromMiliunits(amount: number) {
   return amount / 1000;
-};
+}
 
 export function convertAmountToMiliunits(amount: number) {
   return Math.round(amount * 1000);
-};
+}
 
 export function formatCurrency(value: number) {
-  return Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
+  return Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
     minimumFractionDigits: 2,
   }).format(value);
-};
+}
 
-export function calculatePercentageChange(
-  current: number,
-  previous: number,
-) {
+export function calculatePercentageChange(current: number, previous: number) {
   if (previous === 0) {
     return previous === current ? 0 : 100;
   }
 
   return ((current - previous) / previous) * 100;
-};
+}
 
 export function fillMissingDays(
   activeDays: {
-    date: Date,
+    date: Date;
     income: number;
     expenses: number;
   }[],
@@ -66,27 +63,27 @@ export function fillMissingDays(
   });
 
   return transactionsByDay;
-};
+}
 
 type Period = {
   from: string | Date | undefined;
   to: string | Date | undefined;
 };
 
-export function formatDateRange (period?: Period) {
+export function formatDateRange(period?: Period) {
   const defaultTo = new Date();
   const defaultFrom = subDays(defaultTo, 30);
 
   if (!period?.from) {
-    return `${format(defaultFrom, "LLL dd")} - ${format(defaultTo, "LLL dd, y")}`;
+    return `${format(defaultFrom, 'LLL dd')} - ${format(defaultTo, 'LLL dd, y')}`;
   }
 
   if (period.to) {
-    return `${format(period.from, "LLL dd")} - ${format(period.to, "LLL dd, y")}`;
+    return `${format(period.from, 'LLL dd')} - ${format(period.to, 'LLL dd, y')}`;
   }
 
-  return format(period.from, "LLL dd, y");
-};
+  return format(period.from, 'LLL dd, y');
+}
 
 export function formatPercentage(
   value: number,
@@ -94,8 +91,8 @@ export function formatPercentage(
     addPrefix: false,
   },
 ) {
-  const result = new Intl.NumberFormat("en-US", {
-    style: "percent",
+  const result = new Intl.NumberFormat('en-US', {
+    style: 'percent',
   }).format(value / 100);
 
   if (options.addPrefix && value > 0) {
@@ -103,4 +100,4 @@ export function formatPercentage(
   }
 
   return result;
-};
+}
