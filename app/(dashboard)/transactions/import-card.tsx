@@ -1,29 +1,20 @@
-import { useState } from "react";
-import { format, parse } from "date-fns";
+import { useState } from 'react';
+import { format, parse } from 'date-fns';
 
-import { 
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { convertAmountToMiliunits } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { convertAmountToMiliunits } from '@/lib/utils';
 
-import { ImportTable } from "./import-table";
+import { ImportTable } from './import-table';
 
-const dateFormat = "yyyy-MM-dd HH:mm:ss";
-const outputFormat = "yyyy-MM-dd";
+const dateFormat = 'yyyy-MM-dd HH:mm:ss';
+const outputFormat = 'yyyy-MM-dd';
 
-const requiredOptions = [
-  "amount",
-  "date",
-  "payee",
-];
+const requiredOptions = ['amount', 'date', 'payee'];
 
 interface SelectedColumnsState {
   [key: string]: string | null;
-};
+}
 
 type Props = {
   data: string[][];
@@ -31,22 +22,20 @@ type Props = {
   onSubmit: (data: any) => void;
 };
 
-export const ImportCard = ({
-  data,
-  onCancel,
-  onSubmit,
-}: Props) => {
-  const [selectedColumns, setSelectedColumns] = useState<SelectedColumnsState>({});
+export const ImportCard = ({ data, onCancel, onSubmit }: Props) => {
+  const [selectedColumns, setSelectedColumns] = useState<SelectedColumnsState>(
+    {},
+  );
 
   const headers = data[0];
   const body = data.slice(1);
 
   const onTableHeadSelectChange = (
     columnIndex: number,
-    value: string | null
+    value: string | null,
   ) => {
     setSelectedColumns((prev) => {
-      const newSelectedColumns = {...prev};
+      const newSelectedColumns = { ...prev };
 
       for (const key in newSelectedColumns) {
         if (newSelectedColumns[key] === value) {
@@ -54,7 +43,7 @@ export const ImportCard = ({
         }
       }
 
-      if (value === "skip") {
+      if (value === 'skip') {
         value = null;
       }
 
@@ -67,7 +56,7 @@ export const ImportCard = ({
 
   const handleContinue = () => {
     const getColumnIndex = (column: string) => {
-      return column.split("_")[1];
+      return column.split('_')[1];
     };
 
     const mappedData = {
@@ -75,16 +64,18 @@ export const ImportCard = ({
         const columnIndex = getColumnIndex(`column_${index}`);
         return selectedColumns[`column_${columnIndex}`] || null;
       }),
-      body: body.map((row) => {
-        const transformedRow = row.map((cell, index) => {
-          const columnIndex = getColumnIndex(`column_${index}`);
-          return selectedColumns[`column_${columnIndex}`] ? cell : null;
-        });
+      body: body
+        .map((row) => {
+          const transformedRow = row.map((cell, index) => {
+            const columnIndex = getColumnIndex(`column_${index}`);
+            return selectedColumns[`column_${columnIndex}`] ? cell : null;
+          });
 
-        return transformedRow.every((item) => item === null) 
-          ? []
-          : transformedRow;
-      }).filter((row) => row.length > 0),
+          return transformedRow.every((item) => item === null)
+            ? []
+            : transformedRow;
+        })
+        .filter((row) => row.length > 0),
     };
 
     const arrayOfData = mappedData.body.map((row) => {
@@ -93,7 +84,7 @@ export const ImportCard = ({
         if (header !== null) {
           acc[header] = cell;
         }
-        
+
         return acc;
       }, {});
     });
@@ -101,32 +92,28 @@ export const ImportCard = ({
     const formattedData = arrayOfData.map((item) => ({
       ...item,
       amount: convertAmountToMiliunits(parseFloat(item.amount)),
-      date: format(parse(item.date, dateFormat, new Date()), outputFormat)
+      date: format(parse(item.date, dateFormat, new Date()), outputFormat),
     }));
 
     onSubmit(formattedData);
   };
 
   return (
-    <div className="max-w-screen-2xl mx-auto w-full pb-10 -mt-24">
-      <Card className="border-none drop-shadow-sm">
-        <CardHeader className="gap-y-2 lg:flex-row lg:items-center lg:justify-between">
-          <CardTitle className="text-xl line-clamp-1">
+    <div className='max-w-screen-2xl mx-auto w-full pb-10 -mt-24'>
+      <Card className='border-none drop-shadow-sm'>
+        <CardHeader className='gap-y-2 lg:flex-row lg:items-center lg:justify-between'>
+          <CardTitle className='text-xl line-clamp-1'>
             Import Transaction
           </CardTitle>
-          <div className="flex flex-col lg:flex-row gap-y-2 items-center gap-x-2">
-            <Button 
-              onClick={onCancel} 
-              size="sm" 
-              className="w-full lg:w-auto"
-            >
+          <div className='flex flex-col lg:flex-row gap-y-2 items-center gap-x-2'>
+            <Button onClick={onCancel} size='sm' className='w-full lg:w-auto'>
               Cancel
             </Button>
             <Button
-              size="sm"
+              size='sm'
               disabled={progress < requiredOptions.length}
               onClick={handleContinue}
-              className="w-full lg:w-auto"
+              className='w-full lg:w-auto'
             >
               Continue ({progress} / {requiredOptions.length})
             </Button>

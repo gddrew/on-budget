@@ -1,33 +1,19 @@
 {
-  "version": "6",
+  "version": "7",
   "dialect": "postgresql",
   "entries": [
     {
       "idx": 0,
-      "version": "6",
-      "when": 1715458253067,
-      "tag": "0000_married_living_lightning",
+      "version": "7",
+      "when": 1792586786343,
+      "tag": "0000_lazy_whirlwind",
       "breakpoints": true
     },
     {
       "idx": 1,
-      "version": "6",
-      "when": 1715467019292,
-      "tag": "0001_whole_black_panther",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1715475014882,
-      "tag": "0002_short_young_avengers",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1792578098446,
-      "tag": "0003_bent_tenebrous",
+      "version": "7",
+      "when": 1792588835978,
+      "tag": "0001_flat_kinsey_walden",
       "breakpoints": true
     }
   ]

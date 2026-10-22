@@ -12,6 +12,7 @@ const main = async () => {
   try {
     await migrate(db, { migrationsFolder: 'drizzle' });
     await pool.end();
+    console.log('Database schmema is up to date');
   } catch (error) {
     console.error('Error during migration:', error);
     process.exit(1);
